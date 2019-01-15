@@ -1,34 +1,18 @@
 import express from 'express'
-import fs from 'fs'
 import bodyParser from 'body-parser'
+import routes from './app/routes'
+import cors from 'cors'
 
-const setupRoutes = app => {
-  const APP_DIR = `${__dirname}/app`
-  const features = fs
-    .readdirSync(APP_DIR)
-    .filter(file => fs.statSync(`${APP_DIR}/${file}`).isDirectory())
+const app = express()
+const PORT = 3000
 
-  features.forEach(frature => {
-    const router = express.Router()
-    const routes = require(`${APP_DIR}/${frature}/routes.js`)
+//แปลงค่าจากที่ playload เข้ามาเป็น json
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.use(cors())
 
-    routes.setup(router)
-    app.use(`${frature}`, router)
-  })
-}
+routes(app)
 
-export const setup = () => {
-  const app = express()
-  const PORT = 3000
-
-  //แปลงค่าจากที่ playload เข้ามาเป็น json
-  app.use(bodyParser.urlencoded({ extended: true }))
-  app.use(bodyParser.json())
-
-  setupRoutes(app)
-
-  app.listen(PORT, () => {
-    console.log('App listening on http://localhost:' + PORT)
-  })
-}
-
+app.listen(PORT, () => {
+  console.log('App listening on http://localhost:' + PORT)
+})
